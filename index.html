@@ -7,7 +7,9 @@
 <script src="https://unpkg.com/peerjs@1/dist/peerjs.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
+*{box-sizing:border-box;margin:0;padding:0;touch-action:none}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+button,.card{touch-action:manipulation}
 html,body{height:100%;background:#191228;overflow:hidden;font-family:'Jua','Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:#2b2140;user-select:none;-webkit-user-select:none;touch-action:none;overscroll-behavior:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 body{display:flex;align-items:center;justify-content:center}
 #wrap{position:relative;width:min(100vw,calc(100vh*16/9));width:min(100vw,calc(100dvh*16/9));aspect-ratio:16/9;--u:1px;overflow:hidden;background:#7fd3ff}
@@ -74,7 +76,7 @@ body.portrait .keys{min-width:0;max-width:calc(var(--u)*520)}
 body.portrait #joy{bottom:7vh;height:calc(93vh - 56.25vw)}
 body.portrait #btns{bottom:12vh}
 body.portrait #tP{top:calc(56.25vw + 2vmin)}
-#inCode{font-family:inherit;font-size:calc(var(--u)*30);width:calc(var(--u)*200);text-align:center;text-transform:uppercase;border:calc(var(--u)*4) solid #2b2140;border-radius:calc(var(--u)*20);padding:calc(var(--u)*10);user-select:text;-webkit-user-select:text;touch-action:auto}
+#inCode{font-family:inherit;font-size:max(16px,calc(var(--u)*30));width:calc(var(--u)*200);text-align:center;text-transform:uppercase;border:calc(var(--u)*4) solid #2b2140;border-radius:calc(var(--u)*20);padding:calc(var(--u)*10);user-select:text;-webkit-user-select:text;touch-action:manipulation}
 #netCode{font-size:calc(var(--u)*84);letter-spacing:calc(var(--u)*14);color:#e0456b;line-height:1.2}
 button.net{background:#ff9bb8}
 </style>
@@ -845,6 +847,11 @@ addEventListener('touchstart',enableTouch,{passive:true});
     for(const ev of['pointerup','pointercancel'])b.addEventListener(ev,()=>{TS[k]=0;b.classList.remove('on');});});
   $('tP').addEventListener('pointerdown',e=>{e.preventDefault();if(G.state==='fight'||G.state==='intro')setPause(true);});
   document.addEventListener('contextmenu',e=>e.preventDefault());
+  // 모바일 확대 방지: 핀치, 더블탭
+  for(const ev of['gesturestart','gesturechange','gestureend'])document.addEventListener(ev,e=>e.preventDefault(),{passive:false});
+  document.addEventListener('touchmove',e=>{if(e.touches.length>1||(e.target&&e.target.tagName!=='INPUT'))e.preventDefault();},{passive:false});
+  let lastEnd=0;document.addEventListener('touchend',e=>{const now=Date.now();if(now-lastEnd<350&&!(e.target&&e.target.tagName==='INPUT'))e.preventDefault();lastEnd=now;},{passive:false});
+  document.addEventListener('dblclick',e=>e.preventDefault());
 })();
 function padSync(){const on=touchOn&&G.state!=='menu'&&!G.paused&&$('sRes').hidden&&$('sPause').hidden;const p=$('pad');if(p.hidden===on)p.hidden=!on;}
 
